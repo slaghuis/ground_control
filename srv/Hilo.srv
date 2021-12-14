@@ -1,0 +1,5 @@
+int8 gpio_number
+bool high
+int64 duration_ms
+---
+bool result
