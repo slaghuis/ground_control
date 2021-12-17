@@ -25,6 +25,8 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/GpioRead.srv"
+  "srv/GpioWrite.srv"
   "srv/Hilo.srv"
 )
 
@@ -41,25 +43,37 @@ ament_target_dependencies(publish_position_node
  
 add_executable(ground_control_node
   src/ground_control_node.cpp
+  src/powered_state.cpp
+  src/armed_state.cpp
+  src/flight_state.cpp
 )
 ament_target_dependencies(ground_control_node
   "rclcpp"
   "navigation_interfaces"
 )
+rosidl_target_interfaces(ground_control_node
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+target_include_directories(ground_control_node PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>) 
 
-add_executable(gpio_set_node
-  src/gpio_set_node.cpp
+add_executable(gpio_node
+  src/gpio_node.cpp
 )
-ament_target_dependencies(gpio_set_node
+ament_target_dependencies(gpio_node
   "rclcpp"
 )
-rosidl_target_interfaces(gpio_set_node
+rosidl_target_interfaces(gpio_node
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
 
 install(TARGETS publish_position_node
                 ground_control_node
-                gpio_set_node
+                gpio_node
  DESTINATION lib/${PROJECT_NAME})
  
 ament_package()
